@@ -2,11 +2,14 @@
 // layout, code samples and tables copied from the READMEs of the pinned
 // packages (so the site shows exactly what the release documents), the
 // self-hosted fonts, the brand assets in public/, and the map page's
-// vendored libraries.
+// vendored libraries, and the mirror of the map demo (mirror.mjs; MIRROR=0
+// skips it for a quick local build).
 import { createHash } from 'node:crypto';
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { mirror } from './mirror.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = join(root, 'dist');
@@ -193,6 +196,7 @@ async function snippets() {
   const pack = codeBlocks(core, '## Creating verified content');
   const install = codeBlocks(veritiles, '## Install');
   const intro = paragraphs(section(veritiles, '# veritiles'));
+  const mirrored = JSON.parse(await readFile(join(root, 'mirror.json'), 'utf8'));
   return {
     'code:core-file': codeHtml(codeBlocks(core, '### A large file, by ranges')[0]),
     'code:core-pack-install': codeHtml(pack[0]),
@@ -205,6 +209,8 @@ async function snippets() {
     'install:core': installHtml('npm install @anymirror/core'),
     'install:veritiles': installHtml(install[0].text.trim()),
     'table:hosts': tableHtml(hosts),
+    'table:mirror': mirrorTable(mirrored),
+    'code:mirror': codeHtml({ lang: 'js', text: mirrorSample(mirrored) }),
     'md:vt-intro': `<p class="lead">${inline(intro[0])}</p>`,
     'grid:vt-bullets': `<div class="grid-box"><ul class="grid">${bullets(veritiles, 'the sha2-256 chain rooted in the anchor').map(({ title, text }) => `<li><h3>${inline(title)}</h3><p>${inline(text)}</p></li>`).join('')}</ul></div>`,
     ...Object.fromEntries(Object.entries(readerRows).map(([reader, { entry, size }]) => [
@@ -212,6 +218,31 @@ async function snippets() {
       `<code class="entry">${escape(entry.replace(/`/g, ''))}</code><span class="size">${escape(`${size} gzipped`)}</span>`,
     ])),
   };
+}
+
+// --- The mirror (mirror.json) ---------------------------------------------------
+
+const MIRRORED = [
+  ['map', 'The map: vector tiles, PMTiles', 'map.pmtiles'],
+  ['elevation', 'The terrain: elevation tiles, PMTiles', 'elevation.pmtiles'],
+  ['style', 'The style: MapLibre style JSON', 'assets/style.json'],
+  ['fonts', 'The glyphs: a bundle', 'assets/fonts.car'],
+  ['sprites', 'The sprites: a bundle', 'assets/sprites.car'],
+];
+
+function mirrorTable({ path, anchors }) {
+  const rows = MIRRORED.map(([key, what, file]) =>
+    `<tr><td>${escape(what)}</td><td class="nowrap"><code>${escape(anchors[key])}</code></td><td class="nowrap"><a href="/${path}/${file}"><code>/${escape(`${path}/${file}`)}</code></a></td></tr>`);
+  return `<div class="table-wrap"><table><thead><tr><th scope="col">content</th><th scope="col">CID</th><th scope="col">URL</th></tr></thead><tbody>\n${rows.join('\n')}\n</tbody></table></div>`;
+}
+
+function mirrorSample({ path, anchors }) {
+  return [
+    'const source = new veritiles.VerifiedSource({',
+    `  cid: "${anchors.map}",`,
+    `  hints: "${SITE}/${path}/hints.json", // untrusted, like any location`,
+    '});',
+  ].join('\n');
 }
 
 // --- Assembly ---------------------------------------------------------------------
@@ -290,6 +321,7 @@ async function main() {
   for (const name of ['head', 'nav', 'footer']) partials[name] = await readFile(join(root, 'src/partials', `${name}.html`), 'utf8');
   for (const [name, meta] of Object.entries(PAGES)) await writeFile(join(dist, name), await render(name, meta, partials, values));
   console.log(`dist/: ${Object.keys(PAGES).length} pages`);
+  if (process.env.MIRROR !== '0') await mirror(dist);
 }
 
 await main();

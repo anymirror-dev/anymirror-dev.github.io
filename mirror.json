@@ -1,0 +1,11 @@
+{
+  "path": "mirror/map-demo",
+  "from": "https://guillaumemichel.github.io/ipfs-pmtiles-demo/",
+  "anchors": {
+    "map": "bafyreif33ppi5uijec33dywz6z5cvdzmqd4vxvwof3eaveaedxfbbbur4e",
+    "elevation": "bafyreifzoehwp7pjxlfngk2nhfqypc3xg65cws4apbokteajdhvr4u4apy",
+    "style": "bafkreihjkd3epjd4jlds5yv5ziqg7umd5sliwcvmwrfgqghuyy6km4k6ie",
+    "fonts": "bafyreigr3kszmxht36pxnoddfdraxqnyy4x7ylnqyfnubenpdyqftozamm",
+    "sprites": "bafyreiaqclllimqvvs2g6de3lsets5eipabbwc5bsmdq7yibnkfboot6sm"
+  }
+}

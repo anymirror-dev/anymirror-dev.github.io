@@ -1,5 +1,6 @@
 // A static server for dist/ that resolves paths as GitHub Pages does:
-// /maps serves maps.html, a directory its index.html, anything else 404.html.
+// /maps serves maps.html, a directory its index.html, anything else 404.html;
+// a single byte range gets 206, as the readers require.
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
@@ -27,6 +28,21 @@ async function resolve(urlPath) {
 createServer(async (req, res) => {
   const path = await resolve(new URL(req.url, 'http://localhost').pathname);
   const file = path ?? join(dir, '404.html');
-  res.writeHead(path ? 200 : 404, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
-  res.end(await readFile(file));
+  const type = TYPES[extname(file)] ?? 'application/octet-stream';
+  const bytes = await readFile(file);
+  const range = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range ?? '');
+  if (path === null || range === null) {
+    res.writeHead(path ? 200 : 404, { 'content-type': type, 'accept-ranges': 'bytes' });
+    res.end(bytes);
+    return;
+  }
+  const start = Number(range[1]);
+  const end = Math.min(range[2] === '' ? bytes.length - 1 : Number(range[2]), bytes.length - 1);
+  if (start > end) {
+    res.writeHead(416, { 'content-range': `bytes */${bytes.length}` });
+    res.end();
+    return;
+  }
+  res.writeHead(206, { 'content-type': type, 'content-range': `bytes ${start}-${end}/${bytes.length}` });
+  res.end(bytes.subarray(start, end + 1));
 }).listen(port, () => console.log(`http://localhost:${port}/`));

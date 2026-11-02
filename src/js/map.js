@@ -1,7 +1,8 @@
 // The live map on /maps: the map demo's small set, read through veritiles.
-// Nothing loads until the visitor asks: MapLibre comes from this site, the
-// map's files from the demo on GitHub Pages, located by its hints document
-// and every byte checked against the CIDs below.
+// Nothing loads until the visitor asks. MapLibre comes from this site; the
+// map's files from this site's mirror of the demo first, then from the demo
+// itself on GitHub Pages, each located by a hints document and every byte
+// checked against the CIDs below (mirror.json's).
 
 const DEMO = 'https://guillaumemichel.github.io/ipfs-pmtiles-demo/';
 const ANCHORS = {
@@ -59,7 +60,7 @@ async function load() {
   const { pmtiles, veritiles } = window;
 
   status.textContent = 'Opening the map: its descriptor first, checked against the CID…';
-  const hints = `${DEMO}hints.json`;
+  const hints = ['/mirror/map-demo/hints.json', `${DEMO}hints.json`];
   const map = new veritiles.VerifiedSource({ cid: ANCHORS.map, hints });
   const style = new veritiles.VerifiedAsset({ cid: ANCHORS.style, hints });
   const fonts = new veritiles.VerifiedAsset({ cid: ANCHORS.fonts, hints });

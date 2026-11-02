@@ -84,3 +84,33 @@ test('colours come from the tokens', async () => {
   const stray = [...site.matchAll(/#[0-9A-Fa-f]{3,8}\b/g)].map((m) => m[0]).filter((hex) => !KIT_COLOURS.has(hex));
   assert.deepEqual(stray, []);
 });
+
+// dist/ served from disk: whole files, or one byte range.
+function localFetch(url, init = {}) {
+  const path = decodeURIComponent(new URL(url).pathname);
+  return readFile(join(dist, path)).then((bytes) => {
+    const range = /bytes=(\d+)-(\d+)/.exec(init.headers?.Range ?? init.headers?.range ?? '');
+    if (range === null) return new Response(bytes, { status: 200 });
+    return new Response(bytes.subarray(Number(range[1]), Number(range[2]) + 1), { status: 206 });
+  }, () => new Response('', { status: 404 }));
+}
+
+test('the mirror serves the map demo under the anchors of mirror.json', async () => {
+  const { VerifiedBundle, VerifiedFile, VerifiedRaw } = await import('@anymirror/core');
+  const { path, anchors } = JSON.parse(await readFile(new URL('../mirror.json', import.meta.url), 'utf8'));
+  const base = `https://anymirror.dev/${path}/`;
+  for (const [key, file] of [['map', 'map.pmtiles'], ['elevation', 'elevation.pmtiles']]) {
+    const archive = new VerifiedFile({ cid: anchors[key], source: base + file, fetchFn: localFetch });
+    await archive.ready();
+    for (const offset of [0, Math.floor(archive.size / 2), archive.size - 4096]) await archive.read(offset, 4096);
+    assert.equal(archive.stats.rejected, 0, file);
+  }
+  await new VerifiedRaw({ cid: anchors.style, source: `${base}assets/style.json`, fetchFn: localFetch }).bytes();
+  const fonts = new VerifiedBundle({ cid: anchors.fonts, source: `${base}assets/fonts`, proof: `${base}assets/fonts.car`, fetchFn: localFetch });
+  await fonts.bytes('Noto Sans Regular/0-255.pbf');
+  const sprites = new VerifiedBundle({ cid: anchors.sprites, source: `${base}assets/sprites`, proof: `${base}assets/sprites.car`, fetchFn: localFetch });
+  await sprites.bytes('light.json');
+
+  const live = await readFile(join(dist, 'js/map.js'), 'utf8');
+  for (const key of ['map', 'style', 'fonts', 'sprites']) assert.match(live, new RegExp(`${key}: '${anchors[key]}'`), `map.js reads the mirrored ${key}`);
+});

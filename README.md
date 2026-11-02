@@ -14,7 +14,8 @@ visitor asks for it.
 ```sh
 npm ci
 npm run build    # → dist/
-npm test         # one h1 a page, links and anchors, origins, samples, colours
+npm test         # one h1 a page, links and anchors, origins, samples, colours,
+                 # the mirror (needs a full build; MIRROR=0 skips the mirror)
 npm run serve    # http://localhost:8080/, resolving paths as GitHub Pages does
 ```
 
