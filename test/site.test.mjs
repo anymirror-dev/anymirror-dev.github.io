@@ -114,3 +114,16 @@ test('the mirror serves the map demo under the anchors of mirror.json', async ()
   const live = await readFile(join(dist, 'js/map.js'), 'utf8');
   for (const key of ['map', 'style', 'fonts', 'sprites']) assert.match(live, new RegExp(`${key}: '${anchors[key]}'`), `map.js reads the mirrored ${key}`);
 });
+
+test('crawlers and agents find every page, the docs and the mirror', async () => {
+  const robots = await readFile(join(dist, 'robots.txt'), 'utf8');
+  assert.match(robots, /^User-agent: \*\nAllow: \/$/m);
+  assert.match(robots, /^Sitemap: https:\/\/anymirror\.dev\/sitemap\.xml$/m);
+  const sitemap = await readFile(join(dist, 'sitemap.xml'), 'utf8');
+  const listed = [...sitemap.matchAll(/<loc>https:\/\/anymirror\.dev(\/[^<]*)<\/loc>/g)].map((m) => m[1]);
+  assert.deepEqual(listed, ['/', '/maps', '/docs']);
+  for (const path of listed) assert.ok(await target(path), `${path} exists`);
+  const llms = await readFile(join(dist, 'llms.txt'), 'utf8');
+  assert.match(llms, /^# anymirror\n\n> /);
+  for (const [, url] of llms.matchAll(/\]\((https:\/\/anymirror\.dev\/[^)#]*)/g)) assert.ok(await target(new URL(url).pathname), `llms.txt links ${url}`);
+});

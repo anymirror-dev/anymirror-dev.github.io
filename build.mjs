@@ -245,6 +245,13 @@ function mirrorSample({ path, anchors }) {
   ].join('\n');
 }
 
+// Every page but the 404, for crawlers.
+function sitemap() {
+  const urls = Object.values(PAGES).filter((meta) => meta.path !== '/404')
+    .map((meta) => `  <url><loc>${SITE}${meta.path}</loc></url>`);
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;
+}
+
 // --- Assembly ---------------------------------------------------------------------
 
 function hash(text) {
@@ -320,6 +327,7 @@ async function main() {
   const partials = {};
   for (const name of ['head', 'nav', 'footer']) partials[name] = await readFile(join(root, 'src/partials', `${name}.html`), 'utf8');
   for (const [name, meta] of Object.entries(PAGES)) await writeFile(join(dist, name), await render(name, meta, partials, values));
+  await writeFile(join(dist, 'sitemap.xml'), sitemap());
   console.log(`dist/: ${Object.keys(PAGES).length} pages`);
   if (process.env.MIRROR !== '0') await mirror(dist);
 }

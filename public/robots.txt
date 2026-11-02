@@ -1,0 +1,13 @@
+# Crawlers and AI agents are welcome: read everything a person can.
+# Only the large binaries stay out of crawls (the mirrored archives and
+# the vendored MapLibre bundle); programs that read the mirror on a page's
+# behalf are not crawlers and are not affected. Its hints documents, which
+# say where every file lives, stay open.
+User-agent: *
+Allow: /
+Allow: /mirror/map-demo/hints.json
+Allow: /mirror/map-demo/assets/hints.json
+Disallow: /mirror/
+Disallow: /vendor/
+
+Sitemap: https://anymirror.dev/sitemap.xml

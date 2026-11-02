@@ -1,0 +1,31 @@
+# anymirror
+
+> Verified content over dumb hosts. anymirror fetches files from any HTTP host — a CDN, an S3 bucket, GitHub Pages, a mirror nobody vouches for — and verifies every byte against a single CID before handing it over. A host can withhold bytes, but cannot alter one undetected. Publishing is `cp`; mirroring is `rsync`.
+
+The publisher packs a file with `anymirror-pack`, which writes a small proof beside it and prints the anchor CID; the page trusts that CID alone. Readers fetch the proof pieces covering the bytes they read and check them up a sha2-256 chain to the CID. A tampered response fails, is counted, and the next host is tried. Locations (sources, hints documents, routers) are untrusted: a wrong location costs a request, never a wrong byte. MIT licensed, no runtime dependencies, WebCrypto is the only cryptography.
+
+## Docs
+
+- [anymirror README](https://raw.githubusercontent.com/anymirror-dev/anymirror/main/README.md): the packages and how to build and test them
+- [@anymirror/core README](https://raw.githubusercontent.com/anymirror-dev/anymirror/main/packages/core/README.md): the readers — `VerifiedFile` (a large file by byte ranges), `VerifiedRaw` (a small file whole), `VerifiedBundle` (files by path from a bundle) — their options, errors and host requirements
+- [veritiles README](https://raw.githubusercontent.com/anymirror-dev/anymirror/main/packages/veritiles/README.md): anymirror for maps — a PMTiles `Source`, a MapLibre protocol for verified styles, sprites and glyphs, a script tag
+- [anymirror-pack README](https://raw.githubusercontent.com/anymirror-dev/anymirror/main/packer/README.md): the packer publishers run (Rust)
+- [@anymirror/router README](https://raw.githubusercontent.com/anymirror-dev/anymirror/main/packages/router/README.md): the router contract, where a CID's bytes may live
+- [@anymirror/fisl-router README](https://raw.githubusercontent.com/anymirror-dev/anymirror/main/packages/fisl-router/README.md): a router over a FISL index
+
+## Specification
+
+- [SPEC.md](https://raw.githubusercontent.com/anymirror-dev/anymirror/main/SPEC.md): the anchors, the proof formats, what a reader must check, hints documents and routers
+- [CHANGELOG.md](https://raw.githubusercontent.com/anymirror-dev/anymirror/main/CHANGELOG.md): what changed in each release
+
+## Mirrored here
+
+- [Hints document](https://anymirror.dev/mirror/map-demo/hints.json): every location of the map demo's small set on this site — map and terrain archives (PMTiles, proofs at `<url>.proofs/`), style, glyph and sprite bundles — under the same CIDs as the demo; pass it as `hints` to any reader
+- [Mirror page](https://anymirror.dev/docs#mirror): the CIDs and URLs in a table
+
+## Optional
+
+- [Website](https://anymirror.dev/): the overview, with the code samples of the current release
+- [Maps](https://anymirror.dev/maps): veritiles and a live verified map
+- [Repository](https://github.com/anymirror-dev/anymirror): source, issues, releases
+- [npm: @anymirror/core](https://www.npmjs.com/package/@anymirror/core), [npm: veritiles](https://www.npmjs.com/package/veritiles)
