@@ -1,0 +1,73 @@
+<section class="hero" data-theme="dark">
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <p class="eyebrow">veritiles · anymirror for maps</p>
+      <h1 class="display-xl">Verified map tiles from any host.</h1>
+      {{md:vt-intro}}
+      <div class="actions">
+        {{install:veritiles}}
+      </div>
+    </div>
+    <div class="hero-figure">
+      <p class="figure-label">or as a script tag, which exposes the <code>veritiles</code> global:</p>
+      {{code:vt-script}}
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="why">
+  <div class="container">
+    <h2 class="display-l" id="why">A drop-in PMTiles source.</h2>
+    {{grid:vt-bullets}}
+  </div>
+</section>
+
+<section class="section" data-theme="dark" aria-labelledby="live">
+  <div class="container">
+    <p class="eyebrow accent">Live</p>
+    <h2 class="display-l" id="live">A map that checks every tile.</h2>
+    <p class="lead">The small world map of the <a href="https://guillaumemichel.github.io/ipfs-pmtiles-demo/">map demo</a>, hosted on GitHub Pages: its tiles, style, glyphs and sprites, each checked against its CID before MapLibre draws it.</p>
+    <p class="lead">The map is <a href="https://protomaps.com">Protomaps</a>, and Protomaps is awesome: an open-source map stack on OpenStreetMap data that made PMTiles, the format that puts a whole tiled map in one file any static host can serve, and builds free basemaps and styles for it.</p>
+    <div class="live" data-live-map>
+      <div class="live-stage">
+        <img class="live-preview" src="/map-preview.jpg" alt="The live map: the globe centred on Europe and Africa." width="1150" height="604" loading="lazy">
+        <div class="live-map" id="live-map" hidden></div>
+        <button class="btn primary live-start" type="button" hidden>{{icon:map}}Load the live map</button>
+      </div>
+      <div class="live-bar">
+        <p class="live-status" aria-live="polite">Loading the map fetches MapLibre from this site and the map's files from GitHub Pages.</p>
+        <p class="live-chips"><span class="chip ok" hidden data-verified>{{icon:check}}<span>verified · 0</span></span><span class="chip bad" hidden data-rejected>{{icon:x}}<span>rejected · 0</span></span></p>
+      </div>
+      <noscript><p class="live-status">The live map needs JavaScript. <a href="https://guillaumemichel.github.io/ipfs-pmtiles-demo/">Open the map demo</a>.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="usage">
+  <div class="container">
+    <p class="eyebrow accent">Usage</p>
+    <h2 class="display-l" id="usage">Works with every PMTiles renderer.</h2>
+    <div class="tabs" data-tabs>
+      <div class="tablist" role="tablist" aria-label="Renderers" hidden>
+        <button type="button" role="tab" id="tab-maplibre" aria-controls="panel-maplibre" aria-selected="true">MapLibre GL</button>
+        <button type="button" role="tab" id="tab-leaflet" aria-controls="panel-leaflet" aria-selected="false" tabindex="-1">Leaflet</button>
+        <button type="button" role="tab" id="tab-openlayers" aria-controls="panel-openlayers" aria-selected="false" tabindex="-1">OpenLayers</button>
+      </div>
+      <section class="tabpanel" role="tabpanel" id="panel-maplibre" aria-labelledby="tab-maplibre">
+        <h3 class="tab-title">MapLibre GL</h3>
+        {{code:vt-maplibre}}
+      </section>
+      <section class="tabpanel" role="tabpanel" id="panel-leaflet" aria-labelledby="tab-leaflet">
+        <h3 class="tab-title">Leaflet</h3>
+        {{code:vt-leaflet}}
+      </section>
+      <section class="tabpanel" role="tabpanel" id="panel-openlayers" aria-labelledby="tab-openlayers">
+        <h3 class="tab-title">OpenLayers</h3>
+        {{code:vt-openlayers}}
+      </section>
+    </div>
+    <p class="note">The full API, the verified styles, sprites and glyphs, and the hints documents are in the <a href="https://github.com/anymirror-dev/anymirror/tree/main/packages/veritiles#readme">veritiles README</a>.</p>
+  </div>
+</section>
+
+<script type="module" src="{{asset:map-js}}"></script>

@@ -1,0 +1,125 @@
+<section class="hero" data-theme="dark">
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <p class="eyebrow">Verified content over dumb hosts</p>
+      <h1 class="display-xl">Serve from any mirror. Trust only the bytes.</h1>
+      <p class="lead">anymirror fetches files from any HTTP host — a CDN, an S3 bucket, GitHub Pages, a mirror nobody vouches for — and verifies every byte against a single CID before handing it over. A host can withhold bytes. It cannot alter one undetected.</p>
+      <div class="actions">
+        {{install:core}}
+        <a class="btn secondary" href="/docs">{{icon:book-open}}Read the docs</a>
+      </div>
+    </div>
+    <div class="hero-figure">
+      <ul class="hosts" aria-label="Hosts serving the file">
+        <li><div><b>CDN</b><code>cdn.example/video.mp4</code></div><span class="chip ok">{{icon:check}}verified</span></li>
+        <li><div><b>Untrusted mirror</b><code>mirror.example.org/video.mp4</code></div><span class="chip bad">{{icon:x}}rejected · skipped</span></li>
+        <li><div><b>GitHub Pages</b><code>you.github.io/video.mp4</code></div><span class="chip ok">{{icon:check}}verified</span></li>
+      </ul>
+      <div class="hero-arrow">{{icon:arrow-down}}</div>
+      <figure class="your-page" data-theme="light">
+        <p class="your-page-title"><b>Your page</b><span class="chip cid">bafyrei…</span></p>
+        <div class="strip" role="img" aria-label="23 byte ranges verified, 1 tampered and skipped">
+          <i class="v" style="--i:0"></i><i class="v" style="--i:1"></i><i class="v" style="--i:2"></i><i class="v" style="--i:3"></i><i class="v" style="--i:4"></i><i class="v" style="--i:5"></i><i class="v" style="--i:6"></i><i class="v" style="--i:7"></i><i class="v" style="--i:8"></i><i class="r" style="--i:9"></i><i class="v" style="--i:10"></i><i class="v" style="--i:11"></i><i class="v" style="--i:12"></i><i class="v" style="--i:13"></i><i class="v" style="--i:14"></i><i class="v" style="--i:15"></i><i class="v" style="--i:16"></i><i class="v" style="--i:17"></i><i class="v" style="--i:18"></i><i class="v" style="--i:19"></i><i class="v" style="--i:20"></i><i class="v" style="--i:21"></i><i class="v" style="--i:22"></i><i class="v" style="--i:23"></i>
+        </div>
+        <figcaption>Every byte checked against one CID before it's used.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="container">
+    <p class="eyebrow accent">How it works</p>
+    <h2 class="display-l">Location is a hint. Identity is a hash.</h2>
+    <ol class="cards">
+      <li class="card">
+        <p class="eyebrow muted">01 · Pack</p>
+        <h3 class="heading-2">One file in, one CID out.</h3>
+        <p><code>anymirror-pack</code> writes a small proof beside your file — a descriptor and a tree of digests — and prints the anchor CID. That CID is the only thing your page has to trust.</p>
+      </li>
+      <li class="card">
+        <p class="eyebrow muted">02 · Publish anywhere</p>
+        <h3 class="heading-2">Any host that speaks HTTP.</h3>
+        <p>Copy the file and its proofs to any static host. Publishing is <code>cp</code>; mirroring is <code>rsync</code>. Hints documents or a router tell readers where the bytes live.</p>
+      </li>
+      <li class="card">
+        <p class="eyebrow muted">03 · Verify on read</p>
+        <h3 class="heading-2">Only the proofs you need.</h3>
+        <p>The reader fetches the proof pieces covering the bytes it reads and checks them up a sha2-256 chain to the CID. A tampered response fails, is counted, and the next host is tried.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="section sunken" aria-labelledby="readers">
+  <div class="container">
+    <h2 class="display-l" id="readers">One reader per shape of content.</h2>
+    <div class="grid-box"><ul class="grid readers">
+      <li><h3><code>VerifiedRaw</code></h3><p>One small file (at most 256 KiB), whole.</p><p class="meta">{{reader:VerifiedRaw}}</p></li>
+      <li><h3><code>VerifiedBundle</code></h3><p>Files by path from a bundle: glyphs, sprites, a site.</p><p class="meta">{{reader:VerifiedBundle}}</p></li>
+      <li><h3><code>VerifiedFile</code></h3><p>One large file, such as PMTiles or a video, by byte ranges.</p><p class="meta">{{reader:VerifiedFile}}</p></li>
+    </ul></div>
+    <p class="note">Each behind its own entry point, so a page carries only the code it runs. No dependencies; WebCrypto is the only cryptography.</p>
+  </div>
+</section>
+
+<section class="section" data-theme="dark" id="start">
+  <div class="container split">
+    <div>
+      <p class="eyebrow accent">Get started</p>
+      <h2 class="display-l">Three lines to a verified byte.</h2>
+      <p class="lead">Point a reader at the CID and any URL. Reads resolve to verified bytes, or fail closed.</p>
+    </div>
+    <div class="tabs" data-tabs>
+      <div class="tablist" role="tablist" aria-label="Examples" hidden>
+        <button type="button" role="tab" id="tab-read" aria-controls="panel-read" aria-selected="true">Read a file</button>
+        <button type="button" role="tab" id="tab-pack" aria-controls="panel-pack" aria-selected="false" tabindex="-1">Pack</button>
+        <button type="button" role="tab" id="tab-maps" aria-controls="panel-maps" aria-selected="false" tabindex="-1">Maps</button>
+      </div>
+      <section class="tabpanel" role="tabpanel" id="panel-read" aria-labelledby="tab-read">
+        <h3 class="tab-title">Read a file</h3>
+        {{code:core-file}}
+      </section>
+      <section class="tabpanel" role="tabpanel" id="panel-pack" aria-labelledby="tab-pack">
+        <h3 class="tab-title">Pack</h3>
+        {{code:core-pack-install}}
+        {{code:core-pack}}
+      </section>
+      <section class="tabpanel" role="tabpanel" id="panel-maps" aria-labelledby="tab-maps">
+        <h3 class="tab-title">Maps</h3>
+        {{code:vt-source}}
+        <p><a class="more" href="/maps">veritiles, anymirror for maps {{icon:arrow-right}}</a></p>
+      </section>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="properties">
+  <div class="container">
+    <h2 class="display-l" id="properties">Small, strict, any size.</h2>
+    <div class="grid-box"><ul class="grid">
+      <li><h3>Fails closed</h3><p>Bad bytes are a <code>VerificationError</code>, never a render.</p></li>
+      <li><h3>Mirror failover</h3><p>A host that serves tampered bytes is skipped for the next.</p></li>
+      <li><h3>No dependencies</h3><p>WebCrypto is the only cryptography.</p></li>
+      <li><h3>One request per warm read</h3><p>An exact <code>Range</code> request, the bytes an unverified client would fetch.</p></li>
+      <li><h3>Any size</h3><p>Constant-size proof pieces, fetched as reads need them. No upfront download, no index.</p></li>
+      <li><h3>Authenticated absence</h3><p>A bundle proves a path is missing, unlike a host's 404.</p></li>
+      <li><h3>Locations are untrusted</h3><p>Hints and routers say where to look; a wrong location costs a request, never a wrong byte.</p></li>
+      <li><h3>IPFS-compatible, not IPFS-dependent</h3><p>The packer can emit a UnixFS root and CAR so a gateway serves the same bytes.</p></li>
+    </ul></div>
+  </div>
+</section>
+
+<section class="section top-rule" aria-labelledby="hosts">
+  <div class="container">
+    <h2 class="heading-1" id="hosts">What a host needs</h2>
+    {{table:hosts}}
+  </div>
+</section>
+
+<section class="statement">
+  <div class="container statement-inner">
+    <p class="display-l">A malicious host can withhold data. It can't change it.</p>
+    <a class="btn ink" href="https://github.com/anymirror-dev/anymirror">{{icon:github}}Star on GitHub</a>
+  </div>
+</section>
